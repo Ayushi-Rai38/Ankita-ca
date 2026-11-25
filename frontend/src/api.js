@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:8000";
+const BASE_URL = "https://ecommerce-backend-jqq4.onrender.com";
 
 // ── Build query string from filter object ──
 function buildQuery(filters = {}) {
