@@ -12,8 +12,9 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import seaborn as sns
 import pandas as pd
-
+import threading
 import data_processing as dp
+CHART_LOCK = threading.Lock()
 
 # ── Global style ──
 sns.set_theme(style="whitegrid", font_scale=1.1)

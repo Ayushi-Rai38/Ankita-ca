@@ -56,29 +56,58 @@ function App() {
   }, []);
 
   // Reload all data when filters change
-  const loadData = useCallback(async () => {
-    try {
-      const [kpiData, avgData, maxOrd, maxCust, custData, insightData] =
-        await Promise.all([
-          fetchKPIs(filters),
-          fetchAvgQuantity(filters),
-          fetchMaxOrdersCountry(filters),
-          fetchMaxCustomersCountry(filters),
-          fetchCustomerOrders(filters),
-          fetchInsights(filters),
-        ]);
 
-      setKpis(kpiData);
-      setAvgQuantity(avgData.avg_quantity_per_customer);
-      setMaxOrders(maxOrd);
-      setMaxCustomers(maxCust);
-      setCustomers(custData);
-      setInsights(insightData);
-    } catch (err) {
-      console.error("Error loading data:", err);
-    }
-    setLoading(false);
-  }, [filters]);
+const loadData = useCallback(async () => {
+  const requests = await Promise.allSettled([
+    fetchKPIs(filters),
+    fetchAvgQuantity(filters),
+    fetchMaxOrdersCountry(filters),
+    fetchMaxCustomersCountry(filters),
+    fetchCustomerOrders(filters),
+    fetchInsights(filters),
+  ]);
+
+  const [kpiResult, avgResult, maxOrdResult, maxCustResult, custResult, insightResult] = requests;
+
+  if (kpiResult.status === "fulfilled") {
+    setKpis(kpiResult.value);
+  } else {
+    console.error("KPI API failed:", kpiResult.reason);
+  }
+
+  if (avgResult.status === "fulfilled") {
+    setAvgQuantity(avgResult.value.avg_quantity_per_customer);
+  } else {
+    console.error("Average quantity API failed:", avgResult.reason);
+  }
+
+  if (maxOrdResult.status === "fulfilled") {
+    setMaxOrders(maxOrdResult.value);
+  } else {
+    console.error("Maximum orders API failed:", maxOrdResult.reason);
+  }
+
+  if (maxCustResult.status === "fulfilled") {
+    setMaxCustomers(maxCustResult.value);
+  } else {
+    console.error("Maximum customers API failed:", maxCustResult.reason);
+  }
+
+  if (custResult.status === "fulfilled") {
+    setCustomers(custResult.value);
+  } else {
+    console.error("Customer table API failed:", custResult.reason);
+  }
+
+  if (insightResult.status === "fulfilled") {
+    setInsights(insightResult.value);
+  } else {
+    console.error("Insights API failed:", insightResult.reason);
+  }
+
+  setLoading(false);
+}, [filters]);
+
 
   useEffect(() => {
     setLoading(true);

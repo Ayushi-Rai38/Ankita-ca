@@ -1,63 +1,72 @@
+
 const BASE_URL = "https://ecommerce-backend-jqq4.onrender.com";
 
-// ── Build query string from filter object ──
+// Build query string from filter object
 function buildQuery(filters = {}) {
-  const params = [];
-  if (filters.country) params.push(`country=${encodeURIComponent(filters.country)}`);
-  if (filters.customer_id) params.push(`customer_id=${encodeURIComponent(filters.customer_id)}`);
-  if (filters.start_date) params.push(`start_date=${encodeURIComponent(filters.start_date)}`);
-  if (filters.end_date) params.push(`end_date=${encodeURIComponent(filters.end_date)}`);
-  if (filters.product) params.push(`product=${encodeURIComponent(filters.product)}`);
-  return params.length ? `?${params.join("&")}` : "";
+  const params = new URLSearchParams();
+
+  if (filters.country) params.set("country", filters.country);
+  if (filters.customer_id) params.set("customer_id", filters.customer_id);
+  if (filters.start_date) params.set("start_date", filters.start_date);
+  if (filters.end_date) params.set("end_date", filters.end_date);
+  if (filters.product) params.set("product", filters.product);
+
+  const query = params.toString();
+  return query ? `?${query}` : "";
 }
 
-// ── JSON data fetchers ──
+// Common request handler
+async function apiFetch(endpoint) {
+  const response = await fetch(`${BASE_URL}${endpoint}`);
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(
+      `API error ${response.status}: ${errorText || response.statusText}`
+    );
+  }
+
+  return response.json();
+}
+
+// JSON data fetchers
 export async function fetchKPIs(filters) {
-  const res = await fetch(`${BASE_URL}/api/kpis${buildQuery(filters)}`);
-  return res.json();
+  return apiFetch(`/api/kpis${buildQuery(filters)}`);
 }
 
 export async function fetchCustomerOrders(filters) {
-  const res = await fetch(`${BASE_URL}/api/customers/orders${buildQuery(filters)}`);
-  return res.json();
+  return apiFetch(`/api/customers/orders${buildQuery(filters)}`);
 }
 
 export async function fetchAvgQuantity(filters) {
-  const res = await fetch(`${BASE_URL}/api/customers/avg-quantity${buildQuery(filters)}`);
-  return res.json();
+  return apiFetch(`/api/customers/avg-quantity${buildQuery(filters)}`);
 }
 
 export async function fetchMaxOrdersCountry(filters) {
-  const res = await fetch(`${BASE_URL}/api/countries/max-orders${buildQuery(filters)}`);
-  return res.json();
+  return apiFetch(`/api/countries/max-orders${buildQuery(filters)}`);
 }
 
 export async function fetchMaxCustomersCountry(filters) {
-  const res = await fetch(`${BASE_URL}/api/countries/max-customers${buildQuery(filters)}`);
-  return res.json();
+  return apiFetch(`/api/countries/max-customers${buildQuery(filters)}`);
 }
 
 export async function fetchInsights(filters) {
-  const res = await fetch(`${BASE_URL}/api/insights${buildQuery(filters)}`);
-  return res.json();
+  return apiFetch(`/api/insights${buildQuery(filters)}`);
 }
 
 export async function fetchCountryList() {
-  const res = await fetch(`${BASE_URL}/api/countries`);
-  return res.json();
+  return apiFetch("/api/countries");
 }
 
 export async function fetchProductList() {
-  const res = await fetch(`${BASE_URL}/api/products`);
-  return res.json();
+  return apiFetch("/api/products");
 }
 
 export async function fetchDateRange() {
-  const res = await fetch(`${BASE_URL}/api/date-range`);
-  return res.json();
+  return apiFetch("/api/date-range");
 }
 
-// ── Chart image URL builder ──
+// Chart image URL builder
 export function chartUrl(chartName, filters) {
   return `${BASE_URL}/api/charts/${chartName}${buildQuery(filters)}`;
 }

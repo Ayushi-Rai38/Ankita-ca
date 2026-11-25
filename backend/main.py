@@ -5,7 +5,7 @@ FastAPI application exposing analytics APIs and chart images.
 All endpoints accept optional filter query params that are applied
 consistently via data_processing.filter_dataframe().
 """
-
+from chart_generator import CHART_LOCK
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
@@ -16,15 +16,19 @@ import chart_generator as cg
 app = FastAPI(title="E-commerce Data Analytics API")
 
 
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://ecommerce-analyticss-dashboard.netlify.app"
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://ecommerce-analyticss-dashboard.netlify.app",
     ],
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 
 # ── Helper: extract common filter params ──
