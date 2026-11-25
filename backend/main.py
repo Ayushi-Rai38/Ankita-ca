@@ -15,9 +15,13 @@ import chart_generator as cg
 
 app = FastAPI(title="E-commerce Data Analytics API")
 
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "https://ecommerce-analyticss-dashboard.netlify.app"
+    ],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
